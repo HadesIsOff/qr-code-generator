@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Professional QR Code Generator - Create custom QR codes for URLs, text, WiFi, and more">
+    <meta name="keywords" content="QR code generator, QR maker, barcode generator, free QR code">
+    <meta name="author" content="RayanMarketing">
+    <title>QR Code Generator | Professional QR Creator</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <h1>QR Generator</h1>
+                <p>Professional QR Code Creator</p>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="generator-section">
+                <div class="input-section">
+                    <h2>Generate Your QR Code</h2>
+                    
+                    <div class="type-selector">
+                        <button class="type-btn active" data-type="text">Text</button>
+                        <button class="type-btn" data-type="url">URL</button>
+                        <button class="type-btn" data-type="wifi">WiFi</button>
+                        <button class="type-btn" data-type="email">Email</button>
+                    </div>
+
+                    <div class="input-group text-input active">
+                        <label for="text-content">Enter Text</label>
+                        <textarea id="text-content" placeholder="Enter your text here..."></textarea>
+                    </div>
+
+                    <div class="input-group url-input">
+                        <label for="url-content">Enter URL</label>
+                        <input type="url" id="url-content" placeholder="https://example.com">
+                    </div>
+
+                    <div class="input-group wifi-input">
+                        <label for="wifi-ssid">WiFi Network Name (SSID)</label>
+                        <input type="text" id="wifi-ssid" placeholder="Your WiFi Network Name">
+                        
+                        <label for="wifi-password">Password</label>
+                        <input type="password" id="wifi-password" placeholder="WiFi Password">
+                        
+                        <label for="wifi-security">Security Type</label>
+                        <select id="wifi-security">
+                            <option value="WPA">WPA/WPA2</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">Open Network</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group email-input">
+                        <label for="email-to">Email Address</label>
+                        <input type="email" id="email-to" placeholder="recipient@example.com">
+                        
+                        <label for="email-subject">Subject (Optional)</label>
+                        <input type="text" id="email-subject" placeholder="Email subject">
+                        
+                        <label for="email-body">Message (Optional)</label>
+                        <textarea id="email-body" placeholder="Email message..."></textarea>
+                    </div>
+
+                    <div class="customization">
+                        <h3>Customization</h3>
+                        <div class="custom-options">
+                            <div class="option-group">
+                                <label for="qr-size">Size</label>
+                                <select id="qr-size">
+                                    <option value="200">Small (200x200)</option>
+                                    <option value="300" selected>Medium (300x300)</option>
+                                    <option value="400">Large (400x400)</option>
+                                    <option value="500">Extra Large (500x500)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="option-group">
+                                <label for="error-correction">Error Correction</label>
+                                <select id="error-correction">
+                                    <option value="L">Low (7%)</option>
+                                    <option value="M" selected>Medium (15%)</option>
+                                    <option value="Q">Quartile (25%)</option>
+                                    <option value="H">High (30%)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="generate-btn" id="generate-btn">Generate QR Code</button>
+                </div>
+
+                <div class="output-section">
+                    <div class="qr-preview" id="qr-preview">
+                        <div class="placeholder">
+                            <div class="placeholder-icon">📱</div>
+                            <p>Your QR code will appear here</p>
+                        </div>
+                    </div>
+                    
+                    <div class="download-section" id="download-section" style="display: none;">
+                        <button class="download-btn" id="download-btn">Download QR Code</button>
+                        <button class="copy-btn" id="copy-btn">Copy to Clipboard</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 RayanMarketing. Professional QR Code Generator.</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">GitHub</a>
+                <a href="#" class="footer-link">About</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html> 
