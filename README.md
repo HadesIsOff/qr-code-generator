@@ -27,7 +27,7 @@ A modern, feature-rich QR code generator built with vanilla JavaScript. Create c
 
 ## 🚀 Live Demo
 
-[View Live Demo](https://your-username.github.io/qr-code-generator)
+[View Live Demo](https://hadesisoff.github.io/qr-code-generator)
 
 ## 📸 Screenshots
 
@@ -50,7 +50,7 @@ A modern, feature-rich QR code generator built with vanilla JavaScript. Create c
 ### Quick Start
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/qr-code-generator.git
+   git clone https://github.com/HadesIsOff/qr-code-generator.git
    ```
 
 2. Navigate to the project directory:
@@ -77,7 +77,7 @@ A modern, feature-rich QR code generator built with vanilla JavaScript. Create c
 2. Go to Settings → Pages
 3. Select "Deploy from a branch"
 4. Choose "main" branch and "/" root
-5. Your site will be available at `https://your-username.github.io/qr-code-generator`
+5. Your site will be available at `https://hadesisoff.github.io/qr-code-generator`
 
 ## 📝 Usage Guide
 
@@ -203,8 +203,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👤 Author
 
 **RayanMarketing**
-- GitHub: [@your-username](https://github.com/your-username)
-- Website: [your-website.com](https://your-website.com)
+- GitHub: [@HadesIsOff](https://github.com/HadesIsOff)
+- Portfolio: [github.com/HadesIsOff](https://github.com/HadesIsOff)
 
 ## 🙏 Acknowledgments
 
