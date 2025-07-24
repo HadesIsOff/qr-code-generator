@@ -25,7 +25,6 @@
                 </div>
                 <div class="header-actions">
                     <button class="btn btn-secondary" id="history-btn">History</button>
-                    <button class="btn btn-secondary" id="batch-btn">Batch Mode</button>
                 </div>
             </div>
         </header>
@@ -227,15 +226,28 @@
                         <div class="qr-preview" id="qr-preview">
                             <div class="preview-placeholder">
                                 <div class="placeholder-icon">
-                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                                        <rect x="3" y="3" width="5" height="5"/>
-                                        <rect x="3" y="16" width="5" height="5"/>
-                                        <rect x="16" y="3" width="5" height="5"/>
-                                        <path d="m21 16-3.5-3.5-2.5 2.5"/>
-                                        <path d="m13 21 3.5-3.5L19 20"/>
+                                    <svg width="64" height="64" viewBox="0 0 100 100" fill="none">
+                                        <rect x="10" y="10" width="25" height="25" fill="currentColor" opacity="0.3" rx="2"/>
+                                        <rect x="10" y="65" width="25" height="25" fill="currentColor" opacity="0.3" rx="2"/>
+                                        <rect x="65" y="10" width="25" height="25" fill="currentColor" opacity="0.3" rx="2"/>
+
+                                        <rect x="15" y="15" width="15" height="15" fill="currentColor" opacity="0.5" rx="1"/>
+                                        <rect x="15" y="70" width="15" height="15" fill="currentColor" opacity="0.5" rx="1"/>
+                                        <rect x="70" y="15" width="15" height="15" fill="currentColor" opacity="0.5" rx="1"/>
+                                        
+                                        <rect x="45" y="45" width="10" height="10" fill="currentColor" opacity="0.4" rx="1"/>
+                                        <rect x="40" y="30" width="5" height="5" fill="currentColor" opacity="0.3"/>
+                                        <rect x="50" y="30" width="5" height="5" fill="currentColor" opacity="0.3"/>
+                                        <rect x="40" y="60" width="5" height="5" fill="currentColor" opacity="0.3"/>
+                                        <rect x="50" y="60" width="5" height="5" fill="currentColor" opacity="0.3"/>
+                                        <rect x="30" y="40" width="5" height="5" fill="currentColor" opacity="0.3"/>
+                                        <rect x="30" y="50" width="5" height="5" fill="currentColor" opacity="0.3"/>
+                                        <rect x="60" y="40" width="5" height="5" fill="currentColor" opacity="0.3"/>
+                                        <rect x="60" y="50" width="5" height="5" fill="currentColor" opacity="0.3"/>
                                     </svg>
                                 </div>
-                                <p>QR code will appear here</p>
+                                <p>Generate a QR code to see preview</p>
+                                <small>Your QR code will appear here with download options</small>
                             </div>
                         </div>
                         
@@ -264,9 +276,10 @@
         </main>
 
         <div class="notification" id="notification"></div>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" defer></script>
-    <script src="js/script.js" defer></script>
+    <script src="lib/qrcode.min.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html> 

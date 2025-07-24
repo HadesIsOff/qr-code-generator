@@ -19,16 +19,11 @@ class QRStudio {
     waitForDependencies() {
         return new Promise((resolve) => {
             if (typeof QRCode !== 'undefined') {
+                console.log('QRCode library loaded successfully');
                 resolve();
             } else {
-                const checkQRCode = () => {
-                    if (typeof QRCode !== 'undefined') {
-                        resolve();
-                    } else {
-                        setTimeout(checkQRCode, 100);
-                    }
-                };
-                checkQRCode();
+                console.error('QRCode library not found');
+                resolve(); // Continue anyway, will show error in generateQRCode
             }
         });
     }
@@ -47,6 +42,7 @@ class QRStudio {
         document.getElementById('copy-btn')?.addEventListener('click', () => this.copyToClipboard());
         document.getElementById('save-btn')?.addEventListener('click', () => this.saveToHistory());
         document.getElementById('share-btn')?.addEventListener('click', () => this.shareQRCode());
+        document.getElementById('history-btn')?.addEventListener('click', () => this.toggleHistory());
 
         document.querySelectorAll('input, textarea, select').forEach(input => {
             input.addEventListener('input', () => this.validateCurrentInput());
@@ -241,8 +237,14 @@ class QRStudio {
         }
     }
 
-    async generateQRCode() {
+    generateQRCode() {
         if (this.isGenerating) return;
+        
+        if (typeof QRCode === 'undefined') {
+            this.showNotification('QR Code library not loaded. Please refresh the page.', 'error');
+            console.error('QRCode library is not defined');
+            return;
+        }
         
         const content = this.getQRContent();
         if (!content) {
@@ -259,35 +261,35 @@ class QRStudio {
         try {
             const size = parseInt(document.getElementById('qr-size').value);
             const errorCorrectionLevel = document.getElementById('error-correction').value;
-            const margin = parseInt(document.getElementById('qr-margin').value);
-            const format = document.getElementById('qr-format').value;
             
-            const options = {
-                width: size,
-                height: size,
-                errorCorrectionLevel: errorCorrectionLevel,
-                type: format === 'png' ? 'image/png' : format === 'jpg' ? 'image/jpeg' : 'image/svg+xml',
-                quality: 0.92,
-                margin: margin,
-                color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
-                }
-            };
-
+            let correctLevel;
+            switch(errorCorrectionLevel) {
+                case 'L': correctLevel = QRCode.CorrectLevel.L; break;
+                case 'M': correctLevel = QRCode.CorrectLevel.M; break;
+                case 'Q': correctLevel = QRCode.CorrectLevel.Q; break;
+                case 'H': correctLevel = QRCode.CorrectLevel.H; break;
+                default: correctLevel = QRCode.CorrectLevel.M;
+            }
+            
             const qrPreview = document.getElementById('qr-preview');
             qrPreview.innerHTML = '';
             
-            if (format === 'svg') {
-                const svgString = await QRCode.toString(content, { ...options, type: 'svg' });
-                qrPreview.innerHTML = svgString;
-                this.currentQRCode = { type: 'svg', data: svgString };
-            } else {
-                const canvas = document.createElement('canvas');
-                await QRCode.toCanvas(canvas, content, options);
-                qrPreview.appendChild(canvas);
-                this.currentQRCode = { type: 'canvas', data: canvas };
-            }
+            const qrContainer = document.createElement('div');
+            qrContainer.style.display = 'flex';
+            qrContainer.style.alignItems = 'center';
+            qrContainer.style.justifyContent = 'center';
+            qrPreview.appendChild(qrContainer);
+
+            const qrcode = new QRCode(qrContainer, {
+                text: content,
+                width: size,
+                height: size,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: correctLevel
+            });
+
+            this.currentQRCode = { type: 'qrcode', data: qrcode, element: qrContainer };
             
             qrPreview.classList.add('has-qr');
             
@@ -330,15 +332,23 @@ class QRStudio {
         }
 
         try {
-            const format = document.getElementById('qr-format').value;
             const link = document.createElement('a');
-            link.download = `qr-code-${this.currentType}-${Date.now()}.${format}`;
+            link.download = `qr-code-${this.currentType}-${Date.now()}.png`;
             
-            if (this.currentQRCode.type === 'svg') {
-                const blob = new Blob([this.currentQRCode.data], { type: 'image/svg+xml' });
-                link.href = URL.createObjectURL(blob);
+            const canvas = this.currentQRCode.element.querySelector('canvas');
+            const img = this.currentQRCode.element.querySelector('img');
+            
+            if (canvas) {
+                link.href = canvas.toDataURL('image/png');
+            } else if (img) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                link.href = canvas.toDataURL('image/png');
             } else {
-                link.href = this.currentQRCode.data.toDataURL(`image/${format === 'jpg' ? 'jpeg' : format}`);
+                throw new Error('No QR code image found');
             }
             
             document.body.appendChild(link);
@@ -359,8 +369,10 @@ class QRStudio {
         }
 
         try {
-            if (this.currentQRCode.type === 'canvas' && navigator.clipboard && this.currentQRCode.data.toBlob) {
-                this.currentQRCode.data.toBlob(async (blob) => {
+            const canvas = this.currentQRCode.element.querySelector('canvas');
+            
+            if (canvas && navigator.clipboard && canvas.toBlob) {
+                canvas.toBlob(async (blob) => {
                     try {
                         const item = new ClipboardItem({ 'image/png': blob });
                         await navigator.clipboard.write([item]);
@@ -380,11 +392,16 @@ class QRStudio {
 
     fallbackCopy() {
         try {
+            const canvas = this.currentQRCode.element.querySelector('canvas');
+            const img = this.currentQRCode.element.querySelector('img');
+            
             let textToCopy = '';
-            if (this.currentQRCode.type === 'svg') {
-                textToCopy = this.currentQRCode.data;
+            if (canvas) {
+                textToCopy = canvas.toDataURL();
+            } else if (img) {
+                textToCopy = img.src;
             } else {
-                textToCopy = this.currentQRCode.data.toDataURL();
+                throw new Error('No QR code image found');
             }
             
             navigator.clipboard.writeText(textToCopy).then(() => {
@@ -405,8 +422,7 @@ class QRStudio {
             type: this.currentType,
             content: this.getQRContent(),
             timestamp: new Date().toISOString(),
-            size: parseInt(document.getElementById('qr-size').value),
-            format: document.getElementById('qr-format').value
+            size: parseInt(document.getElementById('qr-size').value)
         };
 
         this.history.unshift(historyItem);
@@ -506,17 +522,99 @@ class QRStudio {
         this.switchType(item.type);
         
         setTimeout(() => {
-            if (item.type === 'text') {
-                document.getElementById('text-content').value = item.content;
-            } else if (item.type === 'url') {
-                document.getElementById('url-content').value = item.content;
+            switch(item.type) {
+                case 'text':
+                    document.getElementById('text-content').value = item.content;
+                    break;
+                case 'url':
+                    document.getElementById('url-content').value = item.content;
+                    break;
+                case 'wifi':
+                    if (item.content.includes('WIFI:')) {
+                        const parts = item.content.split(';');
+                        const ssid = parts.find(p => p.startsWith('S:'))?.substring(2) || '';
+                        const password = parts.find(p => p.startsWith('P:'))?.substring(2) || '';
+                        const security = parts.find(p => p.startsWith('T:'))?.substring(2) || 'WPA';
+                        
+                        document.getElementById('wifi-ssid').value = ssid;
+                        document.getElementById('wifi-password').value = password;
+                        document.getElementById('wifi-security').value = security;
+                    }
+                    break;
+                case 'email':
+                    if (item.content.startsWith('mailto:')) {
+                        const url = new URL(item.content);
+                        document.getElementById('email-to').value = url.pathname;
+                        document.getElementById('email-subject').value = url.searchParams.get('subject') || '';
+                        document.getElementById('email-body').value = url.searchParams.get('body') || '';
+                    }
+                    break;
+                case 'vcard':
+                    const lines = item.content.split('\n');
+                    lines.forEach(line => {
+                        if (line.startsWith('FN:')) {
+                            document.getElementById('vcard-name').value = line.substring(3);
+                        } else if (line.startsWith('ORG:')) {
+                            document.getElementById('vcard-org').value = line.substring(4);
+                        } else if (line.startsWith('TEL:')) {
+                            document.getElementById('vcard-phone').value = line.substring(4);
+                        } else if (line.startsWith('EMAIL:')) {
+                            document.getElementById('vcard-email').value = line.substring(6);
+                        } else if (line.startsWith('URL:')) {
+                            document.getElementById('vcard-url').value = line.substring(4);
+                        }
+                    });
+                    break;
             }
 
-            document.getElementById('qr-size').value = item.size;
-            document.getElementById('qr-format').value = item.format;
+            if (item.size) {
+                document.getElementById('qr-size').value = item.size;
+            }
             
             this.validateCurrentInput();
+            this.showNotification('Loaded from history', 'success');
         }, 50);
+    }
+
+    toggleHistory() {
+        const sidebar = document.querySelector('.sidebar');
+        const workspace = document.querySelector('.workspace');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        if (window.innerWidth < 1200) {
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+            
+            if (sidebar.classList.contains('show')) {
+                this.showNotification('History panel shown', 'success');
+                overlay.addEventListener('click', () => this.closeHistory(), { once: true });
+            } else {
+                this.showNotification('History panel hidden', 'success');
+            }
+        } else {
+            if (sidebar.style.display === 'none' || window.getComputedStyle(sidebar).display === 'none') {
+                sidebar.style.display = 'flex';
+                workspace.style.gridTemplateColumns = '320px 1fr 420px';
+                this.showNotification('History panel shown', 'success');
+            } else {
+                sidebar.style.display = 'none';
+                workspace.style.gridTemplateColumns = '1fr 420px';
+                this.showNotification('History panel hidden', 'success');
+            }
+        }
+    }
+
+    closeHistory() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (window.innerWidth < 1200) {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        } else {
+            sidebar.style.display = 'none';
+            document.querySelector('.workspace').style.gridTemplateColumns = '1fr 420px';
+        }
     }
 
     showNotification(message, type = 'success') {
