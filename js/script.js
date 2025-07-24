@@ -630,6 +630,37 @@ class QRStudio {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new QRStudio();
+document.addEventListener('DOMContentLoaded', function() {
+    // Prevent multiple initializations
+    if (window.qrStudioInitialized) {
+        return;
+    }
+    window.qrStudioInitialized = true;
+
+    // Enhanced library loading check with CDN fallback
+    function initializeQRStudio() {
+        if (typeof QRCode !== 'undefined') {
+            const qrStudio = new QRStudio();
+            qrStudio.init();
+        } else {
+            console.warn('QRCode library not found, loading CDN fallback...');
+            const script = document.createElement('script');
+            script.src = 'https://raw.githubusercontent.com/davidshimjs/qrcodejs/master/qrcode.min.js';
+            script.onload = function() {
+                console.log('QRCode library loaded from CDN');
+                const qrStudio = new QRStudio();
+                qrStudio.init();
+            };
+            script.onerror = function() {
+                console.error('Failed to load QRCode library from CDN');
+                document.getElementById('notification').innerHTML = 
+                    '<div class="notification error">⚠️ Failed to load QR Code library. Please refresh the page.</div>';
+                document.getElementById('notification').style.display = 'block';
+            };
+            document.head.appendChild(script);
+        }
+    }
+
+    // Initialize with a small delay to ensure all resources are loaded
+    setTimeout(initializeQRStudio, 100);
 }); 
