@@ -631,13 +631,11 @@ class QRStudio {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Prevent multiple initializations
     if (window.qrStudioInitialized) {
         return;
     }
     window.qrStudioInitialized = true;
 
-    // Enhanced library loading check with CDN fallback
     function initializeQRStudio() {
         if (typeof QRCode !== 'undefined') {
             const qrStudio = new QRStudio();
@@ -661,6 +659,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Initialize with a small delay to ensure all resources are loaded
     setTimeout(initializeQRStudio, 100);
 }); 
