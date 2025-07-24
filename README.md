@@ -2,7 +2,7 @@
 
 A modern, feature-rich QR code generator built with vanilla JavaScript. Create custom QR codes for various content types with a sleek dark theme interface.
 
-![QR Generator Preview](https://via.placeholder.com/800x400/8b5cf6/ffffff?text=QR+Generator+Preview)
+![QR Studio Preview](assets/qr-code-text-1753346511168.png)
 
 ## ✨ Features
 
@@ -27,23 +27,28 @@ A modern, feature-rich QR code generator built with vanilla JavaScript. Create c
 
 ## 🚀 Live Demo
 
-[View Live Demo](https://hadesisoff.github.io/qr-code-generator)
+[🌐 View Live Demo](https://hadesisoff.github.io/qr-code-generator)
+
+![QR Studio Preview](assets/qr-code-text-1753346511168.png)
 
 ## 📸 Screenshots
 
-### Desktop View
-![Desktop Screenshot](https://via.placeholder.com/600x400/1a1a1a/ffffff?text=Desktop+View)
+### Desktop View - QR Studio Interface
+![QR Studio Desktop Interface](assets/qr-code-text-1753346511168.png)
 
-### Mobile View
-![Mobile Screenshot](https://via.placeholder.com/300x500/1a1a1a/ffffff?text=Mobile+View)
+*Professional QR Studio interface featuring:*
+- **Left Panel**: Quick templates and QR code history
+- **Center Panel**: Multi-type QR generator with customization options  
+- **Right Panel**: Live preview with download and share capabilities
+- **Modern Dark Theme**: Sleek professional design suitable for business use
 
 ## 🛠️ Technologies Used
 
 - **HTML5** - Semantic markup structure
 - **CSS3** - Modern styling with CSS Grid and Flexbox
 - **Vanilla JavaScript** - ES6+ features and modern APIs
-- **QRCode.js** - Reliable QR code generation library
-- **Inter Font** - Clean, professional typography
+- **QRCode.js** - Reliable QR code generation library by davidshimjs
+- **Geist Font** - Clean, professional typography for modern interfaces
 
 ## 📦 Installation & Setup
 
@@ -183,13 +188,15 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📋 Roadmap
 
-- [ ] **Color Customization** - Custom QR code colors
-- [ ] **Logo Embedding** - Add logos to QR codes
-- [ ] **Batch Generation** - Generate multiple QR codes
-- [ ] **QR Code History** - Save generated codes locally
-- [ ] **API Integration** - URL shortening service
+- [x] **QR Code History** - ✅ Save generated codes locally (Completed)
+- [x] **Quick Templates** - ✅ Business, WiFi, Social, Contact templates (Completed)
+- [x] **Professional UI** - ✅ Modern dark theme with responsive design (Completed)
+- [ ] **Color Customization** - Custom QR code colors and branding
+- [ ] **Logo Embedding** - Add logos to QR codes center
+- [ ] **Batch Generation** - Generate multiple QR codes at once
 - [ ] **Export Formats** - SVG, PDF export options
-- [ ] **Analytics** - QR code scan tracking
+- [ ] **Analytics Dashboard** - QR code scan tracking and statistics
+- [ ] **API Integration** - URL shortening service integration
 
 ## 🐛 Known Issues
 
