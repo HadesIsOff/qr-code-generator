@@ -3,129 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Professional QR Code Generator - Create custom QR codes for URLs, text, WiFi, and more">
-    <meta name="keywords" content="QR code generator, QR maker, barcode generator, free QR code">
+    <meta name="description" content="Professional QR Code Generator - Advanced QR code creation with templates, batch processing, and analytics">
+    <meta name="keywords" content="QR code generator, professional QR maker, batch QR codes, QR analytics, business QR codes">
     <meta name="author" content="RayanMarketing">
-    <title>QR Code Generator | Professional QR Creator</title>
+    <title>QR Studio | Professional QR Code Generator</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     
-    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 </head>
 <body>
-    <div class="container">
+    <div class="app">
         <header class="header">
-            <div class="logo">
-                <h1>QR Generator</h1>
-                <p>Professional QR Code Creator</p>
+            <div class="header-content">
+                <div class="brand">
+                    <h1 class="brand-title">QR Studio</h1>
+                    <span class="brand-subtitle">Professional QR Code Generator</span>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="history-btn">History</button>
+                    <button class="btn btn-secondary" id="batch-btn">Batch Mode</button>
+                </div>
             </div>
         </header>
 
-        <main class="main-content">
-            <div class="generator-section">
-                <div class="input-section">
-                    <h2>Generate Your QR Code</h2>
-                    
-                    <div class="type-selector">
-                        <button class="type-btn active" data-type="text">Text</button>
-                        <button class="type-btn" data-type="url">URL</button>
-                        <button class="type-btn" data-type="wifi">WiFi</button>
-                        <button class="type-btn" data-type="email">Email</button>
-                    </div>
-
-                    <div class="input-group text-input active">
-                        <label for="text-content">Enter Text</label>
-                        <textarea id="text-content" placeholder="Enter your text here..."></textarea>
-                    </div>
-
-                    <div class="input-group url-input">
-                        <label for="url-content">Enter URL</label>
-                        <input type="url" id="url-content" placeholder="https://example.com">
-                    </div>
-
-                    <div class="input-group wifi-input">
-                        <label for="wifi-ssid">WiFi Network Name (SSID)</label>
-                        <input type="text" id="wifi-ssid" placeholder="Your WiFi Network Name">
-                        
-                        <label for="wifi-password">Password</label>
-                        <input type="password" id="wifi-password" placeholder="WiFi Password">
-                        
-                        <label for="wifi-security">Security Type</label>
-                        <select id="wifi-security">
-                            <option value="WPA">WPA/WPA2</option>
-                            <option value="WEP">WEP</option>
-                            <option value="nopass">Open Network</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group email-input">
-                        <label for="email-to">Email Address</label>
-                        <input type="email" id="email-to" placeholder="recipient@example.com">
-                        
-                        <label for="email-subject">Subject (Optional)</label>
-                        <input type="text" id="email-subject" placeholder="Email subject">
-                        
-                        <label for="email-body">Message (Optional)</label>
-                        <textarea id="email-body" placeholder="Email message..."></textarea>
-                    </div>
-
-                    <div class="customization">
-                        <h3>Customization</h3>
-                        <div class="custom-options">
-                            <div class="option-group">
-                                <label for="qr-size">Size</label>
-                                <select id="qr-size">
-                                    <option value="200">Small (200x200)</option>
-                                    <option value="300" selected>Medium (300x300)</option>
-                                    <option value="400">Large (400x400)</option>
-                                    <option value="500">Extra Large (500x500)</option>
-                                </select>
-                            </div>
-                            
-                            <div class="option-group">
-                                <label for="error-correction">Error Correction</label>
-                                <select id="error-correction">
-                                    <option value="L">Low (7%)</option>
-                                    <option value="M" selected>Medium (15%)</option>
-                                    <option value="Q">Quartile (25%)</option>
-                                    <option value="H">High (30%)</option>
-                                </select>
-                            </div>
+        <main class="main">
+            <div class="workspace">
+                <aside class="sidebar">
+                    <div class="templates-section">
+                        <h3 class="section-title">Quick Templates</h3>
+                        <div class="templates-grid">
+                            <button class="template-card" data-template="business">
+                                <div class="template-icon">🏢</div>
+                                <span>Business Card</span>
+                            </button>
+                            <button class="template-card" data-template="wifi">
+                                <div class="template-icon">📶</div>
+                                <span>WiFi Access</span>
+                            </button>
+                            <button class="template-card" data-template="social">
+                                <div class="template-icon">🔗</div>
+                                <span>Social Profile</span>
+                            </button>
+                            <button class="template-card" data-template="contact">
+                                <div class="template-icon">📞</div>
+                                <span>Contact Info</span>
+                            </button>
                         </div>
                     </div>
 
-                    <button class="generate-btn" id="generate-btn">Generate QR Code</button>
+                    <div class="recent-section">
+                        <h3 class="section-title">Recent QR Codes</h3>
+                        <div class="recent-list" id="recent-list">
+                            <div class="empty-state">
+                                <span>No recent QR codes</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <div class="content">
+                    <div class="generator-panel">
+                        <div class="panel-header">
+                            <div class="type-tabs">
+                                <button class="tab-btn active" data-type="text">Text</button>
+                                <button class="tab-btn" data-type="url">URL</button>
+                                <button class="tab-btn" data-type="wifi">WiFi</button>
+                                <button class="tab-btn" data-type="email">Email</button>
+                                <button class="tab-btn" data-type="vcard">vCard</button>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="input-section">
+                                <div class="input-group text-input active">
+                                    <label for="text-content">Text Content</label>
+                                    <textarea id="text-content" placeholder="Enter your text here..." rows="4"></textarea>
+                                </div>
+
+                                <div class="input-group url-input">
+                                    <label for="url-content">Website URL</label>
+                                    <input type="url" id="url-content" placeholder="https://example.com">
+                                    <div class="input-hint">Add protocol (https://) for better compatibility</div>
+                                </div>
+
+                                <div class="input-group wifi-input">
+                                    <label for="wifi-ssid">Network Name (SSID)</label>
+                                    <input type="text" id="wifi-ssid" placeholder="Your WiFi Network Name">
+                                    
+                                    <label for="wifi-password">Password</label>
+                                    <input type="password" id="wifi-password" placeholder="Network Password">
+                                    
+                                    <label for="wifi-security">Security Type</label>
+                                    <select id="wifi-security">
+                                        <option value="WPA">WPA/WPA2</option>
+                                        <option value="WEP">WEP</option>
+                                        <option value="nopass">Open Network</option>
+                                    </select>
+                                    
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="wifi-hidden">
+                                        <label for="wifi-hidden">Hidden Network</label>
+                                    </div>
+                                </div>
+
+                                <div class="input-group email-input">
+                                    <label for="email-to">Email Address</label>
+                                    <input type="email" id="email-to" placeholder="recipient@example.com">
+                                    
+                                    <label for="email-subject">Subject</label>
+                                    <input type="text" id="email-subject" placeholder="Email subject (optional)">
+                                    
+                                    <label for="email-body">Message</label>
+                                    <textarea id="email-body" placeholder="Email message (optional)" rows="3"></textarea>
+                                </div>
+
+                                <div class="input-group vcard-input">
+                                    <div class="vcard-grid">
+                                        <div>
+                                            <label for="vcard-name">Full Name</label>
+                                            <input type="text" id="vcard-name" placeholder="John Doe">
+                                        </div>
+                                        <div>
+                                            <label for="vcard-org">Organization</label>
+                                            <input type="text" id="vcard-org" placeholder="Company Name">
+                                        </div>
+                                        <div>
+                                            <label for="vcard-phone">Phone</label>
+                                            <input type="tel" id="vcard-phone" placeholder="+1 234 567 8900">
+                                        </div>
+                                        <div>
+                                            <label for="vcard-email">Email</label>
+                                            <input type="email" id="vcard-email" placeholder="john@example.com">
+                                        </div>
+                                        <div class="full-width">
+                                            <label for="vcard-url">Website</label>
+                                            <input type="url" id="vcard-url" placeholder="https://example.com">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="customization-section">
+                                <h3 class="section-title">Customization</h3>
+                                <div class="custom-grid">
+                                    <div class="custom-group">
+                                        <label for="qr-size">Size</label>
+                                        <select id="qr-size">
+                                            <option value="200">Small (200px)</option>
+                                            <option value="300" selected>Medium (300px)</option>
+                                            <option value="400">Large (400px)</option>
+                                            <option value="500">XL (500px)</option>
+                                            <option value="600">XXL (600px)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="custom-group">
+                                        <label for="error-correction">Error Correction</label>
+                                        <select id="error-correction">
+                                            <option value="L">Low (7%)</option>
+                                            <option value="M" selected>Medium (15%)</option>
+                                            <option value="Q">Quartile (25%)</option>
+                                            <option value="H">High (30%)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="custom-group">
+                                        <label for="qr-margin">Margin</label>
+                                        <select id="qr-margin">
+                                            <option value="1">Minimal</option>
+                                            <option value="2" selected>Standard</option>
+                                            <option value="4">Large</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="custom-group">
+                                        <label for="qr-format">Format</label>
+                                        <select id="qr-format">
+                                            <option value="png" selected>PNG</option>
+                                            <option value="jpg">JPG</option>
+                                            <option value="svg">SVG</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="actions">
+                                <button class="btn btn-primary" id="generate-btn" disabled>
+                                    <span class="btn-text">Generate QR Code</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="output-section">
-                    <div class="qr-preview" id="qr-preview">
-                        <div class="placeholder">
-                            <div class="placeholder-icon">📱</div>
-                            <p>Your QR code will appear here</p>
+                <div class="preview-panel">
+                    <div class="preview-header">
+                        <h3 class="section-title">Preview</h3>
+                        <div class="preview-actions" id="preview-actions" style="display: none;">
+                            <button class="btn btn-icon" id="save-btn" title="Save to History">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                    <polyline points="17,21 17,13 7,13 7,21"/>
+                                    <polyline points="7,3 7,8 15,8"/>
+                                </svg>
+                            </button>
+                            <button class="btn btn-icon" id="share-btn" title="Share">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="18" cy="5" r="3"/>
+                                    <circle cx="6" cy="12" r="3"/>
+                                    <circle cx="18" cy="19" r="3"/>
+                                    <path d="m8.59 13.51 6.83 3.98"/>
+                                    <path d="m15.41 6.51-6.82 3.98"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                     
-                    <div class="download-section" id="download-section" style="display: none;">
-                        <button class="download-btn" id="download-btn">Download QR Code</button>
-                        <button class="copy-btn" id="copy-btn">Copy to Clipboard</button>
+                    <div class="preview-content">
+                        <div class="qr-preview" id="qr-preview">
+                            <div class="preview-placeholder">
+                                <div class="placeholder-icon">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                        <rect x="3" y="3" width="5" height="5"/>
+                                        <rect x="3" y="16" width="5" height="5"/>
+                                        <rect x="16" y="3" width="5" height="5"/>
+                                        <path d="m21 16-3.5-3.5-2.5 2.5"/>
+                                        <path d="m13 21 3.5-3.5L19 20"/>
+                                    </svg>
+                                </div>
+                                <p>QR code will appear here</p>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-info" id="preview-info" style="display: none;">
+                            <div class="info-item">
+                                <span class="info-label">Type:</span>
+                                <span class="info-value" id="info-type">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Size:</span>
+                                <span class="info-value" id="info-size">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Data:</span>
+                                <span class="info-value" id="info-data">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="download-actions" id="download-actions" style="display: none;">
+                            <button class="btn btn-secondary" id="copy-btn">Copy</button>
+                            <button class="btn btn-primary" id="download-btn">Download</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <footer class="footer">
-            <p>&copy; 2025 RayanMarketing. Professional QR Code Generator.</p>
-            <div class="footer-links">
-                <a href="#" class="footer-link">GitHub</a>
-                <a href="#" class="footer-link">About</a>
-            </div>
-        </footer>
+        <div class="notification" id="notification"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <script src="js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" defer></script>
+    <script src="js/script.js" defer></script>
 </body>
 </html> 

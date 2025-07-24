@@ -1,110 +1,181 @@
-class QRGenerator {
+class QRStudio {
     constructor() {
         this.currentType = 'text';
         this.currentQRCode = null;
+        this.history = this.loadHistory();
+        this.templates = this.getTemplates();
+        this.isGenerating = false;
         this.init();
     }
 
     init() {
-        this.setupEventListeners();
-        this.showActiveInput();
+        this.waitForDependencies().then(() => {
+            this.setupEventListeners();
+            this.renderRecentList();
+            this.validateCurrentInput();
+        });
+    }
+
+    waitForDependencies() {
+        return new Promise((resolve) => {
+            if (typeof QRCode !== 'undefined') {
+                resolve();
+            } else {
+                const checkQRCode = () => {
+                    if (typeof QRCode !== 'undefined') {
+                        resolve();
+                    } else {
+                        setTimeout(checkQRCode, 100);
+                    }
+                };
+                checkQRCode();
+            }
+        });
     }
 
     setupEventListeners() {
-        const typeBtns = document.querySelectorAll('.type-btn');
-        const generateBtn = document.getElementById('generate-btn');
-        const downloadBtn = document.getElementById('download-btn');
-        const copyBtn = document.getElementById('copy-btn');
-
-        typeBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.switchType(btn.dataset.type);
-            });
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.switchType(btn.dataset.type));
         });
 
-        generateBtn.addEventListener('click', () => {
-            this.generateQRCode();
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.addEventListener('click', () => this.applyTemplate(card.dataset.template));
         });
 
-        downloadBtn.addEventListener('click', () => {
-            this.downloadQRCode();
+        document.getElementById('generate-btn').addEventListener('click', () => this.generateQRCode());
+        document.getElementById('download-btn')?.addEventListener('click', () => this.downloadQRCode());
+        document.getElementById('copy-btn')?.addEventListener('click', () => this.copyToClipboard());
+        document.getElementById('save-btn')?.addEventListener('click', () => this.saveToHistory());
+        document.getElementById('share-btn')?.addEventListener('click', () => this.shareQRCode());
+
+        document.querySelectorAll('input, textarea, select').forEach(input => {
+            input.addEventListener('input', () => this.validateCurrentInput());
         });
 
-        copyBtn.addEventListener('click', () => {
-            this.copyToClipboard();
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                const generateBtn = document.getElementById('generate-btn');
+                if (!generateBtn.disabled) {
+                    generateBtn.click();
+                }
+            }
         });
-
-        this.setupInputListeners();
     }
 
-    setupInputListeners() {
-        const inputs = document.querySelectorAll('input, textarea, select');
-        inputs.forEach(input => {
-            input.addEventListener('input', () => {
-                this.validateInputs();
+    getTemplates() {
+        return {
+            business: {
+                type: 'vcard',
+                data: {
+                    name: 'John Smith',
+                    org: 'Tech Solutions Inc.',
+                    phone: '+1 (555) 123-4567',
+                    email: 'john@techsolutions.com',
+                    url: 'https://techsolutions.com'
+                }
+            },
+            wifi: {
+                type: 'wifi',
+                data: {
+                    ssid: 'MyOfficeWiFi',
+                    password: 'SecurePassword123',
+                    security: 'WPA',
+                    hidden: false
+                }
+            },
+            social: {
+                type: 'url',
+                data: {
+                    url: 'https://linkedin.com/in/yourprofile'
+                }
+            },
+            contact: {
+                type: 'text',
+                data: {
+                    text: 'Contact John Smith\nPhone: +1 (555) 123-4567\nEmail: john@example.com'
+                }
+            }
+        };
+    }
+
+    applyTemplate(templateName) {
+        const template = this.templates[templateName];
+        if (!template) return;
+
+        this.switchType(template.type);
+        
+        setTimeout(() => {
+            Object.entries(template.data).forEach(([key, value]) => {
+                const element = document.getElementById(`${template.type}-${key}`);
+                if (element) {
+                    element.value = value;
+                    if (element.type === 'checkbox') {
+                        element.checked = value;
+                    }
+                }
             });
-        });
+            this.validateCurrentInput();
+        }, 50);
     }
 
     switchType(type) {
         this.currentType = type;
         
-        document.querySelectorAll('.type-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`[data-type="${type}"]`).classList.add('active');
 
-        document.querySelectorAll('.input-group').forEach(group => {
-            group.classList.remove('active');
-        });
+        document.querySelectorAll('.input-group').forEach(group => group.classList.remove('active'));
         document.querySelector(`.${type}-input`).classList.add('active');
 
-        this.validateInputs();
+        this.validateCurrentInput();
     }
 
-    showActiveInput() {
-        document.querySelector('.text-input').classList.add('active');
-        this.validateInputs();
-    }
-
-    validateInputs() {
+    validateCurrentInput() {
         const generateBtn = document.getElementById('generate-btn');
         let isValid = false;
+        let content = '';
 
         switch(this.currentType) {
             case 'text':
-                const textContent = document.getElementById('text-content').value.trim();
-                isValid = textContent.length > 0;
+                content = document.getElementById('text-content').value.trim();
+                isValid = content.length > 0;
                 break;
             case 'url':
-                const urlContent = document.getElementById('url-content').value.trim();
-                isValid = this.isValidURL(urlContent);
+                content = document.getElementById('url-content').value.trim();
+                isValid = content.length > 0 && this.isValidURL(content);
                 break;
             case 'wifi':
-                const wifiSSID = document.getElementById('wifi-ssid').value.trim();
-                isValid = wifiSSID.length > 0;
+                const ssid = document.getElementById('wifi-ssid').value.trim();
+                isValid = ssid.length > 0;
                 break;
             case 'email':
-                const emailTo = document.getElementById('email-to').value.trim();
-                isValid = this.isValidEmail(emailTo);
+                const email = document.getElementById('email-to').value.trim();
+                isValid = this.isValidEmail(email);
+                break;
+            case 'vcard':
+                const name = document.getElementById('vcard-name').value.trim();
+                isValid = name.length > 0;
                 break;
         }
 
-        generateBtn.disabled = !isValid;
+        generateBtn.disabled = !isValid || this.isGenerating;
     }
 
     isValidURL(string) {
         try {
+            if (!string.startsWith('http://') && !string.startsWith('https://')) {
+                string = 'https://' + string;
+            }
             new URL(string);
             return true;
-        } catch (_) {
+        } catch {
             return false;
         }
     }
 
     isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
     getQRContent() {
@@ -123,11 +194,12 @@ class QRGenerator {
                 const ssid = document.getElementById('wifi-ssid').value.trim();
                 const password = document.getElementById('wifi-password').value;
                 const security = document.getElementById('wifi-security').value;
+                const hidden = document.getElementById('wifi-hidden').checked;
                 
                 if (security === 'nopass') {
-                    return `WIFI:T:nopass;S:${ssid};;`;
+                    return `WIFI:T:nopass;S:${ssid};H:${hidden};;`;
                 } else {
-                    return `WIFI:T:${security};S:${ssid};P:${password};;`;
+                    return `WIFI:T:${security};S:${ssid};P:${password};H:${hidden};;`;
                 }
             
             case 'email':
@@ -147,34 +219,56 @@ class QRGenerator {
                 
                 return mailto;
             
+            case 'vcard':
+                const name = document.getElementById('vcard-name').value.trim();
+                const org = document.getElementById('vcard-org').value.trim();
+                const phone = document.getElementById('vcard-phone').value.trim();
+                const email = document.getElementById('vcard-email').value.trim();
+                const vcardUrl = document.getElementById('vcard-url').value.trim();
+                
+                let vcard = 'BEGIN:VCARD\nVERSION:3.0\n';
+                if (name) vcard += `FN:${name}\n`;
+                if (org) vcard += `ORG:${org}\n`;
+                if (phone) vcard += `TEL:${phone}\n`;
+                if (email) vcard += `EMAIL:${email}\n`;
+                if (vcardUrl) vcard += `URL:${vcardUrl}\n`;
+                vcard += 'END:VCARD';
+                
+                return vcard;
+            
             default:
                 return '';
         }
     }
 
     async generateQRCode() {
+        if (this.isGenerating) return;
+        
         const content = this.getQRContent();
         if (!content) {
-            this.showToast('Please enter valid content', 'error');
+            this.showNotification('Please enter valid content', 'error');
             return;
         }
 
+        this.isGenerating = true;
         const generateBtn = document.getElementById('generate-btn');
-        const originalText = generateBtn.innerHTML;
-        generateBtn.innerHTML = '<span class="loading"></span>Generating...';
+        const originalContent = generateBtn.innerHTML;
+        generateBtn.innerHTML = '<span class="loading"></span><span class="btn-text">Generating...</span>';
         generateBtn.disabled = true;
 
         try {
             const size = parseInt(document.getElementById('qr-size').value);
             const errorCorrectionLevel = document.getElementById('error-correction').value;
+            const margin = parseInt(document.getElementById('qr-margin').value);
+            const format = document.getElementById('qr-format').value;
             
             const options = {
                 width: size,
                 height: size,
                 errorCorrectionLevel: errorCorrectionLevel,
-                type: 'image/png',
+                type: format === 'png' ? 'image/png' : format === 'jpg' ? 'image/jpeg' : 'image/svg+xml',
                 quality: 0.92,
-                margin: 2,
+                margin: margin,
                 color: {
                     dark: '#000000',
                     light: '#FFFFFF'
@@ -184,139 +278,260 @@ class QRGenerator {
             const qrPreview = document.getElementById('qr-preview');
             qrPreview.innerHTML = '';
             
-            const canvas = document.createElement('canvas');
-            await QRCode.toCanvas(canvas, content, options);
+            if (format === 'svg') {
+                const svgString = await QRCode.toString(content, { ...options, type: 'svg' });
+                qrPreview.innerHTML = svgString;
+                this.currentQRCode = { type: 'svg', data: svgString };
+            } else {
+                const canvas = document.createElement('canvas');
+                await QRCode.toCanvas(canvas, content, options);
+                qrPreview.appendChild(canvas);
+                this.currentQRCode = { type: 'canvas', data: canvas };
+            }
             
-            qrPreview.appendChild(canvas);
             qrPreview.classList.add('has-qr');
             
-            this.currentQRCode = canvas;
+            this.updatePreviewInfo(content, size, this.currentType);
+            this.showDownloadActions();
+            this.showPreviewActions();
             
-            document.getElementById('download-section').style.display = 'flex';
-            
-            this.showToast('QR Code generated successfully!');
+            this.showNotification('QR Code generated successfully!', 'success');
             
         } catch (error) {
             console.error('Error generating QR code:', error);
-            this.showToast('Error generating QR code. Please try again.', 'error');
+            this.showNotification('Error generating QR code. Please try again.', 'error');
         } finally {
-            generateBtn.innerHTML = originalText;
-            generateBtn.disabled = false;
-            this.validateInputs();
+            this.isGenerating = false;
+            generateBtn.innerHTML = originalContent;
+            this.validateCurrentInput();
         }
+    }
+
+    updatePreviewInfo(content, size, type) {
+        document.getElementById('info-type').textContent = type.toUpperCase();
+        document.getElementById('info-size').textContent = `${size}x${size}px`;
+        document.getElementById('info-data').textContent = content.length > 50 ? 
+            content.substring(0, 50) + '...' : content;
+        document.getElementById('preview-info').style.display = 'flex';
+    }
+
+    showDownloadActions() {
+        document.getElementById('download-actions').style.display = 'flex';
+    }
+
+    showPreviewActions() {
+        document.getElementById('preview-actions').style.display = 'flex';
     }
 
     downloadQRCode() {
         if (!this.currentQRCode) {
-            this.showToast('No QR code to download', 'error');
+            this.showNotification('No QR code to download', 'error');
             return;
         }
 
         try {
-            const canvas = this.currentQRCode;
+            const format = document.getElementById('qr-format').value;
             const link = document.createElement('a');
-            link.download = `qr-code-${this.currentType}-${Date.now()}.png`;
-            link.href = canvas.toDataURL();
+            link.download = `qr-code-${this.currentType}-${Date.now()}.${format}`;
+            
+            if (this.currentQRCode.type === 'svg') {
+                const blob = new Blob([this.currentQRCode.data], { type: 'image/svg+xml' });
+                link.href = URL.createObjectURL(blob);
+            } else {
+                link.href = this.currentQRCode.data.toDataURL(`image/${format === 'jpg' ? 'jpeg' : format}`);
+            }
             
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            this.showToast('QR Code downloaded successfully!');
+            this.showNotification('QR Code downloaded successfully!', 'success');
         } catch (error) {
             console.error('Error downloading QR code:', error);
-            this.showToast('Error downloading QR code', 'error');
+            this.showNotification('Error downloading QR code', 'error');
         }
     }
 
     async copyToClipboard() {
         if (!this.currentQRCode) {
-            this.showToast('No QR code to copy', 'error');
+            this.showNotification('No QR code to copy', 'error');
             return;
         }
 
         try {
-            const canvas = this.currentQRCode;
-            
-            if (navigator.clipboard && canvas.toBlob) {
-                canvas.toBlob(async (blob) => {
+            if (this.currentQRCode.type === 'canvas' && navigator.clipboard && this.currentQRCode.data.toBlob) {
+                this.currentQRCode.data.toBlob(async (blob) => {
                     try {
                         const item = new ClipboardItem({ 'image/png': blob });
                         await navigator.clipboard.write([item]);
-                        this.showToast('QR Code copied to clipboard!');
+                        this.showNotification('QR Code copied to clipboard!', 'success');
                     } catch (error) {
-                        this.fallbackCopy(canvas);
+                        this.fallbackCopy();
                     }
                 });
             } else {
-                this.fallbackCopy(canvas);
+                this.fallbackCopy();
             }
         } catch (error) {
             console.error('Error copying QR code:', error);
-            this.showToast('Error copying QR code', 'error');
+            this.showNotification('Error copying QR code', 'error');
         }
     }
 
-    fallbackCopy(canvas) {
+    fallbackCopy() {
         try {
-            const dataURL = canvas.toDataURL();
-            const textarea = document.createElement('textarea');
-            textarea.value = dataURL;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
+            let textToCopy = '';
+            if (this.currentQRCode.type === 'svg') {
+                textToCopy = this.currentQRCode.data;
+            } else {
+                textToCopy = this.currentQRCode.data.toDataURL();
+            }
             
-            this.showToast('QR Code data copied to clipboard!');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                this.showNotification('QR Code data copied to clipboard!', 'success');
+            }).catch(() => {
+                this.showNotification('Copy not supported in this browser', 'error');
+            });
         } catch (error) {
-            this.showToast('Copy not supported in this browser', 'error');
+            this.showNotification('Copy not supported in this browser', 'error');
         }
     }
 
-    showToast(message, type = 'success') {
-        const existingToast = document.querySelector('.toast');
-        if (existingToast) {
-            existingToast.remove();
+    saveToHistory() {
+        if (!this.currentQRCode) return;
+
+        const historyItem = {
+            id: Date.now(),
+            type: this.currentType,
+            content: this.getQRContent(),
+            timestamp: new Date().toISOString(),
+            size: parseInt(document.getElementById('qr-size').value),
+            format: document.getElementById('qr-format').value
+        };
+
+        this.history.unshift(historyItem);
+        this.history = this.history.slice(0, 20);
+        this.saveHistory();
+        this.renderRecentList();
+        this.showNotification('QR Code saved to history!', 'success');
+    }
+
+    shareQRCode() {
+        if (!this.currentQRCode) return;
+
+        if (navigator.share && this.currentQRCode.type === 'canvas') {
+            this.currentQRCode.data.toBlob(async (blob) => {
+                try {
+                    const file = new File([blob], 'qr-code.png', { type: 'image/png' });
+                    await navigator.share({
+                        title: 'QR Code',
+                        text: 'Check out this QR code!',
+                        files: [file]
+                    });
+                } catch (error) {
+                    this.fallbackShare();
+                }
+            });
+        } else {
+            this.fallbackShare();
+        }
+    }
+
+    fallbackShare() {
+        const content = this.getQRContent();
+        const shareText = `Check out this QR code: ${content}`;
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareText).then(() => {
+                this.showNotification('Share text copied to clipboard!', 'success');
+            });
+        } else {
+            this.showNotification('Sharing not supported in this browser', 'error');
+        }
+    }
+
+    loadHistory() {
+        try {
+            return JSON.parse(localStorage.getItem('qr-studio-history') || '[]');
+        } catch {
+            return [];
+        }
+    }
+
+    saveHistory() {
+        try {
+            localStorage.setItem('qr-studio-history', JSON.stringify(this.history));
+        } catch (error) {
+            console.warn('Could not save history to localStorage:', error);
+        }
+    }
+
+    renderRecentList() {
+        const recentList = document.getElementById('recent-list');
+        
+        if (this.history.length === 0) {
+            recentList.innerHTML = '<div class="empty-state"><span>No recent QR codes</span></div>';
+            return;
         }
 
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        
-        document.body.appendChild(toast);
+        const recentItems = this.history.slice(0, 5).map(item => {
+            const date = new Date(item.timestamp).toLocaleDateString();
+            const preview = item.content.substring(0, 30) + (item.content.length > 30 ? '...' : '');
+            
+            return `
+                <div class="recent-item" data-id="${item.id}">
+                    <div class="recent-info">
+                        <div class="recent-type">${item.type.toUpperCase()}</div>
+                        <div class="recent-content">${preview}</div>
+                        <div class="recent-date">${date}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        recentList.innerHTML = recentItems;
+
+        document.querySelectorAll('.recent-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const id = parseInt(item.dataset.id);
+                this.loadFromHistory(id);
+            });
+        });
+    }
+
+    loadFromHistory(id) {
+        const item = this.history.find(h => h.id === id);
+        if (!item) return;
+
+        this.switchType(item.type);
         
         setTimeout(() => {
-            toast.classList.add('show');
-        }, 100);
+            if (item.type === 'text') {
+                document.getElementById('text-content').value = item.content;
+            } else if (item.type === 'url') {
+                document.getElementById('url-content').value = item.content;
+            }
+
+            document.getElementById('qr-size').value = item.size;
+            document.getElementById('qr-format').value = item.format;
+            
+            this.validateCurrentInput();
+        }, 50);
+    }
+
+    showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = `notification ${type}`;
+        
+        setTimeout(() => notification.classList.add('show'), 100);
         
         setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 300);
+            notification.classList.remove('show');
         }, 3000);
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    new QRGenerator();
-});
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-        const generateBtn = document.getElementById('generate-btn');
-        if (!generateBtn.disabled) {
-            generateBtn.click();
-        }
-    }
-});
-
-window.addEventListener('beforeunload', (e) => {
-    const hasQRCode = document.querySelector('.qr-preview.has-qr');
-    if (hasQRCode) {
-        e.preventDefault();
-        e.returnValue = '';
-    }
+    new QRStudio();
 }); 
