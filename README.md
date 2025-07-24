@@ -209,7 +209,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👤 Author
 
-**RayanMarketing**
+**Hades**
 - GitHub: [@HadesIsOff](https://github.com/HadesIsOff)
 - Portfolio: [github.com/HadesIsOff](https://github.com/HadesIsOff)
 
@@ -226,5 +226,5 @@ If this project helped you, please give it a ⭐ star on GitHub!
 ---
 
 <div align="center">
-  <strong>Made with ❤️ by RayanMarketing</strong>
+  <strong>Made with ❤️ by Hades</strong>
 </div> 
